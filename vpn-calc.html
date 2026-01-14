@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бизнес-аналитика VPN: Инфраструктура и Бюджет</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',   // Royal Blue
+                        secondary: '#06B6D4', // Cyan
+                        accent: '#F43F5E',    // Rose
+                        dark: '#0F172A',      // Slate 900
+                        light: '#F8FAFC',     // Slate 50
+                        surface: '#FFFFFF',
+                        profit: '#10B981',    // Green
+                        cost: '#EF4444'       // Red
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F1F5F9; color: #1E293B; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+        .table-responsive { overflow-x: auto; }
+        html { scroll-behavior: smooth; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom Select Styling for Dark Mode Card */
+        .custom-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <header class="bg-dark text-white sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2 shrink-0 mr-4">
+                <span class="text-2xl">📊</span>
+                <h1 class="text-xl font-bold tracking-wide hidden sm:block">VPN Analytics</h1>
+            </div>
+            <!-- Navigation pushed to the right, strict row -->
+            <nav class="flex items-center gap-3 text-sm font-medium">
+                <a href="#russian-cloud" class="bg-rose-600 px-3 py-2 rounded hover:bg-rose-700 transition shadow-md text-white text-center whitespace-nowrap">
+                    🇷🇺 РФ
+                </a>
+                <a href="#europe-latency" class="bg-indigo-600 px-3 py-2 rounded hover:bg-indigo-700 transition shadow-md text-white text-center whitespace-nowrap">
+                    🇪🇺 Европа
+                </a>
+                <a href="#economics" class="bg-emerald-600 px-3 py-2 rounded hover:bg-emerald-700 transition shadow-md text-white text-center whitespace-nowrap">
+                    💰 Бюджет
+                </a>
+                <a href="#master-table" class="bg-blue-600 px-3 py-2 rounded hover:bg-blue-700 transition shadow-md text-white text-center whitespace-nowrap">
+                    📋 Список
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="bg-gradient-to-br from-gray-900 to-blue-900 text-white py-10">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-2">Бизнес-план VPN Инфраструктуры</h2>
+            <p class="text-gray-300 max-w-2xl mx-auto text-sm md:text-base">
+                Интерактивный калькулятор: выберите провайдеров и оцените бюджет.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 space-y-16">
+
+        <!-- SECTION: ECONOMICS -->
+        <section id="economics" class="scroll-mt-24">
+            <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between">
+                <div>
+                    <h3 class="text-3xl font-bold text-dark border-l-8 border-emerald-500 pl-4">💰 Unit-экономика</h3>
+                    <p class="mt-2 text-gray-600 max-w-2xl">
+                        Расчет расходов при ARPU <strong>$3/мес</strong> и трафике <strong>30 ГБ/юзер</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- MIXED STRATEGY CARD (INTERACTIVE) -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-2xl overflow-hidden mb-10 border border-slate-700 text-white">
+
+                <!-- Card Header with Controls -->
+                <div class="p-6 border-b border-slate-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-xl font-bold flex items-center gap-2">
+                            🌍 Смешанная стратегия (Калькулятор)
+                        </h4>
+                        <span class="text-xs font-normal bg-yellow-500 text-black px-2 py-0.5 rounded">Интерактивно</span>
+                    </div>
+
+                    <p class="text-gray-400 text-sm mb-6">
+                        Распределение трафика: <strong>40% РФ</strong>, <strong>40% Европа</strong>, <strong>20% Америка</strong>.
+                        <br>Выберите поставщиков для каждого региона, чтобы увидеть изменение маржи.
+                    </p>
+
+                    <!-- CONTROLS ROW -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-800/50 p-4 rounded-lg border border-slate-600">
+                        <!-- Select RU -->
+                        <div>
+                            <label class="block text-xs text-rose-400 font-bold uppercase tracking-wider mb-1">🇷🇺 РФ Провайдер</label>
+                            <select id="select-ru" onchange="renderMixedTable()" class="custom-select w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block p-2.5">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+
+                        <!-- Select EU -->
+                        <div>
+                            <label class="block text-xs text-indigo-400 font-bold uppercase tracking-wider mb-1">🇪🇺 EU Провайдер</label>
+                            <select id="select-eu" onchange="renderMixedTable()" class="custom-select w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+
+                        <!-- Select US -->
+                        <div>
+                            <label class="block text-xs text-blue-400 font-bold uppercase tracking-wider mb-1">🇺🇸 US Провайдер</label>
+                            <select id="select-us" onchange="renderMixedTable()" class="custom-select w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE CONTENT -->
+                <div class="p-6 overflow-x-auto">
+                    <table class="w-full text-center text-sm" id="mixed-table">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-slate-700">
+                                <th class="pb-3 text-left">Юзеры</th>
+                                <th class="pb-3">Трафик (Общий)</th>
+                                <th class="pb-3">Конфигурация (Серверов)</th>
+                                <th class="pb-3">Доход</th>
+                                <th class="pb-3">Расход (Инфра)</th>
+                                <th class="pb-3">Чистая Прибыль</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-base transition-all duration-300" id="mixed-tbody">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h4 class="text-xl font-bold text-gray-800 mb-4">Детализация по отдельным провайдерам</h4>
+            <!-- Single Provider Tables -->
+            <div id="economy-tables" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <!-- Tables will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: RUSSIAN CLOUD -->
+        <section id="russian-cloud" class="grid grid-cols-1 md:grid-cols-3 gap-8 scroll-mt-24">
+            <div class="md:col-span-3">
+                <h3 class="text-2xl font-bold text-dark border-l-4 border-rose-600 pl-4">🇷🇺 Российский Сегмент</h3>
+                <p class="mt-2 text-gray-600">Сравнение стоимости вычислительных мощностей и каналов.</p>
+            </div>
+
+            <div class="bg-surface rounded-xl shadow-md p-6 card-hover md:col-span-2">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Стоимость (RUB)</h4>
+                <div class="chart-container">
+                    <canvas id="ruCloudChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-surface rounded-xl shadow-md p-6 card-hover">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Инсайты</h4>
+                <ul class="space-y-3 text-sm">
+                    <li class="p-2 bg-yellow-50 rounded border-l-2 border-yellow-500">
+                        <strong>Yandex Cloud:</strong> Самый стабильный доступ к Госуслугам, но дорогой трафик.
+                    </li>
+                    <li class="p-2 bg-purple-50 rounded border-l-2 border-purple-500">
+                         <strong>Aeza:</strong> Топ выбор по цене, игровой хостинг.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION: EUROPE & TRAFFIC -->
+        <section id="europe-latency" class="grid grid-cols-1 lg:grid-cols-2 gap-8 scroll-mt-24">
+            <div class="lg:col-span-2">
+                <h3 class="text-2xl font-bold text-dark border-l-4 border-indigo-600 pl-4">🇪🇺 Европа и Трафик</h3>
+            </div>
+
+            <div class="bg-surface rounded-xl shadow-md p-6 card-hover">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Пинг до Москвы (мс)</h4>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-surface rounded-xl shadow-md p-6 card-hover">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Доступный Трафик</h4>
+                <div class="chart-container">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MASTER TABLE -->
+        <section id="master-table" class="scroll-mt-24">
+            <h3 class="text-2xl font-bold text-dark border-l-4 border-blue-600 pl-4 mb-6">📋 Полный список провайдеров</h3>
+            <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-100">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-gray-800 text-white uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4 rounded-tl-xl">Страна</th>
+                            <th class="px-6 py-4">Хостинг</th>
+                            <th class="px-6 py-4">Локация</th>
+                            <th class="px-6 py-4">Трафик</th>
+                            <th class="px-6 py-4">Цена</th>
+                            <th class="px-6 py-4 rounded-tr-xl text-center">Линк</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-gray-700 font-medium" id="master-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-dark text-gray-400 py-10 text-center text-sm">
+        <p>&copy; 2025 VPN Infrastructure Report.</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // --- 1. DATA SOURCES ---
+        const providers = [
+            { id: 'aeza', country: 'РФ/Европа', name: 'Aeza', region: ['ru', 'eu'], loc: 'Moscow/Stockholm', traffic: 'Unlim (1Gbps)', price: '449 ₽', priceUSD: 5.0, quotaTB: 999, overagePerTB: 0, link: 'aeza.net' },
+            { id: 'hetzner', country: 'Финляндия', name: 'Hetzner', region: ['eu'], loc: 'Helsinki', traffic: '20 TB', price: '€4.51', priceUSD: 5.0, quotaTB: 20, overagePerTB: 1.1, link: 'hetzner.com' },
+            { id: 'hostkey', country: 'Нидерланды', name: 'HostKey', region: ['eu'], loc: 'Amsterdam', traffic: 'Unlim', price: '€7.00', priceUSD: 7.7, quotaTB: 999, overagePerTB: 0, link: 'hostkey.com' },
+            { id: 'do', country: 'Нидерланды', name: 'DigitalOcean', region: ['eu', 'us'], loc: 'Amsterdam/NY', traffic: '1 TB', price: '$6.00', priceUSD: 6.0, quotaTB: 1, overagePerTB: 10, link: 'digitalocean.com' },
+            { id: 'yandex', country: 'Россия', name: 'Yandex Cloud', region: ['ru'], loc: 'Moscow', traffic: 'Pay-as-you-go', price: '1200 ₽', priceUSD: 13.0, quotaTB: 0, overagePerTB: 11, link: 'cloud.yandex.ru' },
+            { id: 'vk', country: 'Россия', name: 'VK Cloud', region: ['ru'], loc: 'Moscow', traffic: 'Quotas', price: '950 ₽', priceUSD: 10.5, quotaTB: 0, overagePerTB: 10, link: 'mcs.mail.ru' },
+            { id: 'sber', country: 'Россия', name: 'SberCloud', region: ['ru'], loc: 'Moscow', traffic: 'Enterprise', price: '1100 ₽', priceUSD: 12.0, quotaTB: 0, overagePerTB: 11, link: 'cloud.ru' },
+            { id: 'ovh', country: 'Канада', name: 'OVHcloud', region: ['us'], loc: 'Beauharnois', traffic: 'Unlim', price: '$4.20', priceUSD: 4.2, quotaTB: 999, overagePerTB: 0, link: 'ovhcloud.com' },
+            { id: 'vultr', country: 'США', name: 'Vultr', region: ['us', 'eu'], loc: 'New Jersey', traffic: '2 TB', price: '$6.00', priceUSD: 6.0, quotaTB: 2, overagePerTB: 10, link: 'vultr.com' },
+            { id: 'beget', country: 'Эстония', name: 'Beget', region: ['eu'], loc: 'Tallinn', traffic: 'Fair Use', price: '€5.50', priceUSD: 6.0, quotaTB: 10, overagePerTB: 2, link: 'beget.com' }
+        ];
+
+        // --- 2. MASTER TABLE GENERATION ---
+        const tableBody = document.getElementById('master-table-body');
+        providers.forEach(p => {
+            const isAeza = p.name === 'Aeza';
+            const rowClass = isAeza ? "bg-purple-50 border-l-4 border-purple-500" : "hover:bg-blue-50 transition border-b border-gray-100";
+
+            const row = `
+                <tr class="${rowClass}">
+                    <td class="px-6 py-4 font-medium">${p.country}</td>
+                    <td class="px-6 py-4 font-bold ${isAeza ? 'text-purple-700' : 'text-primary'}">${p.name} ${isAeza ? '<span class="text-xs bg-purple-200 px-1 rounded ml-1">TOP</span>' : ''}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">${p.loc}</td>
+                    <td class="px-6 py-4 text-green-700 font-semibold">${p.traffic}</td>
+                    <td class="px-6 py-4 font-bold text-dark">${p.price}</td>
+                    <td class="px-6 py-4 text-center"><a href="https://${p.link}" target="_blank" class="text-gray-400 hover:text-accent no-underline">🔗</a></td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+
+        // --- 3. ECONOMICS CORE ---
+        const usersScenarios = [100, 1000, 5000, 10000];
+        const avgTrafficPerUserGB = 30;
+        const avgRevenuePerUser = 3;
+
+        function calculateProviderCost(provider, trafficTB, activeUsers) {
+            let serversForCpu = Math.ceil(activeUsers / 1000);
+            if (serversForCpu < 1) serversForCpu = 1;
+
+            let serversBought = serversForCpu;
+            let finalCost = 0;
+
+            if (provider.quotaTB === 999) {
+                let bandwidthServers = 1;
+                if (provider.name.includes('OVH')) {
+                     // OVH Starter 100Mbps limitation check ~ 32TB/mo max theoretical
+                     bandwidthServers = Math.ceil(trafficTB / 30);
+                }
+                serversBought = Math.max(serversForCpu, bandwidthServers);
+                finalCost = serversBought * provider.priceUSD;
+
+            } else if (provider.quotaTB === 0) {
+                // Pay As You Go
+                finalCost = (serversBought * provider.priceUSD) + (trafficTB * provider.overagePerTB);
+            } else {
+                // Quota Logic
+                const totalQuota = serversBought * provider.quotaTB;
+                const deficit = trafficTB - totalQuota;
+
+                if (deficit > 0) {
+                    const costOverage = deficit * provider.overagePerTB;
+                    const serversForTraffic = Math.ceil(trafficTB / provider.quotaTB);
+                    const costNewServers = serversForTraffic * provider.priceUSD;
+
+                    if (costNewServers < (finalCost + costOverage) && serversForTraffic > serversBought) {
+                        serversBought = serversForTraffic;
+                        finalCost = serversBought * provider.priceUSD;
+                    } else {
+                        finalCost = (serversBought * provider.priceUSD) + costOverage;
+                    }
+                } else {
+                    finalCost = serversBought * provider.priceUSD;
+                }
+            }
+            return { cost: finalCost, servers: serversBought };
+        }
+
+        // --- 4. INTERACTIVE MIXED STRATEGY ---
+
+        // Populate Selects
+        const ruSelect = document.getElementById('select-ru');
+        const euSelect = document.getElementById('select-eu');
+        const usSelect = document.getElementById('select-us');
+
+        function populateSelect(selectEl, region, defaultId) {
+            const options = providers.filter(p => p.region.includes(region));
+            options.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerHTML = `${p.name} ($${p.priceUSD})`;
+                if(p.id === defaultId) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        // Initial Populations
+        populateSelect(ruSelect, 'ru', 'yandex'); // Default expensive RU
+        populateSelect(euSelect, 'eu', 'hetzner'); // Default cheap EU
+        populateSelect(usSelect, 'us', 'ovh');     // Default cheap US
+
+        function renderMixedTable() {
+            const mixedTbody = document.getElementById('mixed-tbody');
+            mixedTbody.innerHTML = ''; // Clear current
+
+            const pRU = providers.find(p => p.id === ruSelect.value);
+            const pEU = providers.find(p => p.id === euSelect.value);
+            const pUS = providers.find(p => p.id === usSelect.value);
+
+            usersScenarios.forEach(users => {
+                const totalTraffic = (users * avgTrafficPerUserGB) / 1000;
+                const revenue = users * avgRevenuePerUser;
+
+                // Split: 40% RU, 40% EU, 20% US
+                const trafficRU = totalTraffic * 0.4;
+                const trafficEU = totalTraffic * 0.4;
+                const trafficUS = totalTraffic * 0.2;
+
+                const resRU = calculateProviderCost(pRU, trafficRU, users);
+                const resEU = calculateProviderCost(pEU, trafficEU, users);
+                const resUS = calculateProviderCost(pUS, trafficUS, users);
+
+                const totalCost = resRU.cost + resEU.cost + resUS.cost;
+
+                // Format server string nicely
+                const serverStr = `
+                    <span class="text-rose-300 font-bold">${resRU.servers}</span> <span class="text-xs text-gray-500">(${pRU.name})</span> +
+                    <span class="text-indigo-300 font-bold">${resEU.servers}</span> <span class="text-xs text-gray-500">(${pEU.name})</span> +
+                    <span class="text-blue-300 font-bold">${resUS.servers}</span> <span class="text-xs text-gray-500">(${pUS.name})</span>
+                `;
+
+                const profit = revenue - totalCost;
+                const margin = Math.round((profit / revenue) * 100);
+
+                // Dynamic Margin Color
+                let marginColor = "text-emerald-400";
+                if(margin < 30) marginColor = "text-yellow-400";
+                if(margin < 0) marginColor = "text-red-500";
+
+                const row = `
+                    <tr class="border-b border-slate-700 hover:bg-slate-800 transition">
+                        <td class="py-4 text-left font-bold pl-4 text-lg">${users}</td>
+                        <td class="py-4 text-gray-300">${totalTraffic.toFixed(1)} TB</td>
+                        <td class="py-4 text-gray-300 text-sm">${serverStr}</td>
+                        <td class="py-4 text-green-400 font-bold">$${revenue.toLocaleString()}</td>
+                        <td class="py-4 text-rose-400">$${Math.round(totalCost).toLocaleString()}</td>
+                        <td class="py-4 font-bold ${marginColor} text-lg">
+                            $${Math.round(profit).toLocaleString()} <span class="text-xs text-gray-400 block font-normal">Маржа: ${margin}%</span>
+                        </td>
+                    </tr>
+                `;
+                mixedTbody.innerHTML += row;
+            });
+        }
+
+        // Initial Render
+        renderMixedTable();
+
+        // --- 5. STATIC MONO TABLES ---
+        const ecoProviders = [providers[0], providers[1], providers[4], providers[7]]; // Aeza, Hetzner, Yandex, OVH
+        const ecoContainer = document.getElementById('economy-tables');
+
+        ecoProviders.forEach(p => {
+            let html = `
+                <div class="bg-white rounded-xl shadow-lg border-t-4 ${p.priceUSD > 10 ? 'border-red-500' : 'border-green-500'} overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                        <h4 class="font-bold text-lg">${p.name} <span class="text-xs font-normal text-gray-500">(${p.country})</span></h4>
+                        <span class="text-xs bg-gray-200 px-2 py-1 rounded">~$${p.priceUSD}/mo</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-center">
+                            <thead class="bg-gray-100 text-xs text-gray-500">
+                                <tr>
+                                    <th class="p-2">Юзеры</th>
+                                    <th class="p-2">Доход</th>
+                                    <th class="p-2">Расход</th>
+                                    <th class="p-2">Прибыль</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+            `;
+
+            usersScenarios.forEach(users => {
+                const totalTraffic = (users * avgTrafficPerUserGB) / 1000;
+                const revenue = users * avgRevenuePerUser;
+                const res = calculateProviderCost(p, totalTraffic, users);
+                const profit = revenue - res.cost;
+
+                html += `
+                    <tr>
+                        <td class="p-2 font-bold">${users}</td>
+                        <td class="p-2 text-green-600 font-bold">$${revenue.toLocaleString()}</td>
+                        <td class="p-2 text-red-500 font-semibold">$${Math.round(res.cost).toLocaleString()}</td>
+                        <td class="p-2 font-bold ${profit > 0 ? 'text-green-700' : 'text-red-700'}">$${Math.round(profit).toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table></div></div>`;
+            ecoContainer.innerHTML += html;
+        });
+
+        // --- 6. CHARTS ---
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: { callbacks: { title: (i) => Array.isArray(i[0].chart.data.labels[i[0].dataIndex]) ? i[0].chart.data.labels[i[0].dataIndex].join(' ') : i[0].chart.data.labels[i[0].dataIndex] } },
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } }
+            }
+        };
+
+        new Chart(document.getElementById('ruCloudChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Aeza (Unlim)', 'Yandex Cloud', 'VK Cloud', 'SberCloud'],
+                datasets: [{ label: 'Цена (RUB)', data: [449, 1200, 950, 1100], backgroundColor: ['#A855F7', '#F43F5E', '#2563EB', '#10B981'], borderRadius: 4 }]
+            }, options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
+        });
+
+        new Chart(document.getElementById('latencyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Helsinki (FI)', 'Stockholm (Aeza)', 'Tallinn (EE)', 'Amsterdam (NL)', 'New York (US)'],
+                datasets: [{ label: 'Ping (ms)', data: [18, 22, 25, 38, 110], backgroundColor: ['#10B981', '#A855F7', '#34D399', '#FBBF24', '#EF4444'], indexAxis: 'y' }]
+            }, options: { ...commonOptions, indexAxis: 'y' }
+        });
+
+        new Chart(document.getElementById('trafficChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Unlimited (Aeza/OVH)', 'High Quota 20TB (Hetzner)', 'Low Quota (US/DO)', 'Paid Traffic (Yandex)'],
+                datasets: [{ data: [40, 25, 20, 15], backgroundColor: ['#A855F7', '#3B82F6', '#F59E0B', '#EF4444'], borderWidth: 0 }]
+            }, options: { ...commonOptions, layout: { padding: { bottom: 20, top: 10 } }, cutout: '60%' }
+        });
+
+    </script>
+</body>
+</html>
